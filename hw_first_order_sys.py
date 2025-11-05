@@ -315,25 +315,6 @@ def main() -> None:
         fig = render_plot(time, y)
         st.plotly_chart(fig, use_container_width=True)
 
-        st.markdown(
-            r"""
-            **Constants used in the simulation:**
-
-            $$
-            \begin{aligned}
-                &A = -1.2 \qquad
-                B_{1} = 1.0 \qquad
-                B_{2} = 0.35 \qquad
-                C = 1.0 \\[0.5em]
-                &k_{p} = 1.8 \qquad
-                t_{0} = 0 \qquad
-                t_{f} = 8 \qquad
-                dt = 0.01
-            \end{aligned}
-            $$
-            """
-        )
-
 
 if __name__ == "__main__":
     main()
