@@ -671,21 +671,6 @@ def render_question_four() -> None:
         )
         fig = render_state_input_plot(time, x_signal, u_signal)
         st.plotly_chart(fig, use_container_width=True, theme=None)
-        # st.markdown(
-        #     rf"""
-        #     **Steady-state configuration**
-
-        #     $$
-        #     \begin{{aligned}}
-        #         &A = {STEADY_STATE.A} \qquad
-        #         B = {STEADY_STATE.B} \qquad
-        #         t_\text{{start}} = {STEADY_STATE.steady_start} \text{{ s}} \\
-        #         &\text{{Window}} = {STEADY_STATE.window} \text{{ s}} \qquad
-        #         dt = {STEADY_STATE.dt}
-        #     \end{{aligned}}
-        #     $$
-        #     """
-        # )
 
 
 def main() -> None:
