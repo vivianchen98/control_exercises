@@ -12,6 +12,20 @@ import streamlit as st
 PLOTLY_CONFIG = {"modeBarButtonsToRemove": ["toImage"], "displaylogo": False}
 
 
+def get_plot_style() -> dict[str, str]:
+    """Return CSS-driven colors that adapt automatically to dark mode."""
+    return {
+        "paper_bgcolor": "var(--plot-paper-bgcolor)",
+        "plot_bgcolor": "var(--plot-surface-bgcolor)",
+        "font_color": "var(--plot-font-color)",
+        "tick_color": "var(--plot-tick-color)",
+        "grid_color": "var(--plot-grid-color)",
+        "primary_line": "var(--plot-primary-line)",
+        "state_line": "var(--plot-state-line)",
+        "input_line": "var(--plot-input-line)",
+    }
+
+
 @dataclass(frozen=True)
 class SimulationConstants:
     """Container for the plant, controller, and integration settings."""
@@ -106,24 +120,37 @@ def compute_steady_state_response(
 
 def render_closed_loop_plot(time: np.ndarray, y: np.ndarray, *, height: int = 420) -> go.Figure:
     """Create a Plotly figure mirroring the styling of the HTML original."""
+    style = get_plot_style()
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
             x=time,
             y=y,
             mode="lines",
-            line=dict(width=3, color="#3730a3", shape="spline"),
+            line=dict(width=3, color=style["primary_line"], shape="spline"),
             hovertemplate="<b>t:</b> %{x:.2f} s<br><b>y(t):</b> %{y:.3f}<extra></extra>",
         )
     )
 
     fig.update_layout(
         margin=dict(l=60, r=18, t=28, b=50),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(248,250,252,0.92)",
-        font=dict(family="Inter, sans-serif", color="#111827"),
-        xaxis=dict(title="Time (s)", gridcolor="rgba(99,102,241,0.15)", zeroline=False),
-        yaxis=dict(title="Output y(t)", gridcolor="rgba(99,102,241,0.15)", zeroline=False),
+        paper_bgcolor=style["paper_bgcolor"],
+        plot_bgcolor=style["plot_bgcolor"],
+        font=dict(family="Inter, sans-serif", color=style["font_color"]),
+        xaxis=dict(
+            title="Time (s)",
+            gridcolor=style["grid_color"],
+            zeroline=False,
+            title_font=dict(color=style["font_color"]),
+            tickfont=dict(color=style["tick_color"]),
+        ),
+        yaxis=dict(
+            title="Output y(t)",
+            gridcolor=style["grid_color"],
+            zeroline=False,
+            title_font=dict(color=style["font_color"]),
+            tickfont=dict(color=style["tick_color"]),
+        ),
         height=height,
         showlegend=False,
     )
@@ -133,13 +160,14 @@ def render_closed_loop_plot(time: np.ndarray, y: np.ndarray, *, height: int = 42
 
 def render_state_input_plot(time: np.ndarray, x: np.ndarray, u: np.ndarray) -> go.Figure:
     """Stacked state/input view mirroring the Q4 HTML plot."""
+    style = get_plot_style()
     fig = make_subplots(rows=2, cols=1, shared_xaxes=False, vertical_spacing=0.08)
     fig.add_trace(
         go.Scatter(
             x=time,
             y=x,
             mode="lines",
-            line=dict(width=3, color="#1d4ed8"),
+            line=dict(width=3, color=style["state_line"]),
             hovertemplate="<b>t:</b> %{x:.2f} s<extra></extra>",
             name="x(t)",
         ),
@@ -151,7 +179,7 @@ def render_state_input_plot(time: np.ndarray, x: np.ndarray, u: np.ndarray) -> g
             x=time,
             y=u,
             mode="lines",
-            line=dict(width=2, color="#f97316", dash="dot"),
+            line=dict(width=2, color=style["input_line"], dash="dot"),
             hovertemplate="<b>t:</b> %{x:.2f} s<extra></extra>",
             name="u(t)",
         ),
@@ -162,19 +190,47 @@ def render_state_input_plot(time: np.ndarray, x: np.ndarray, u: np.ndarray) -> g
     fig.update_layout(
         height=520,
         margin=dict(l=60, r=18, t=28, b=50),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(248,250,252,0.92)",
-        font=dict(family="Inter, sans-serif", color="#111827"),
+        paper_bgcolor=style["paper_bgcolor"],
+        plot_bgcolor=style["plot_bgcolor"],
+        font=dict(family="Inter, sans-serif", color=style["font_color"]),
         hovermode="x unified",
         showlegend=False,
     )
-    fig.update_xaxes(title_text="Time (s)", gridcolor="rgba(99,102,241,0.15)", zeroline=False, row=1, col=1)
-    fig.update_xaxes(title_text="Time (s)", gridcolor="rgba(99,102,241,0.15)", zeroline=False, row=2, col=1)
-    fig.update_yaxes(
-        title_text="x(t)", gridcolor="rgba(99,102,241,0.15)", zeroline=False, showticklabels=False, row=1, col=1
+    fig.update_xaxes(
+        title_text="Time (s)",
+        gridcolor=style["grid_color"],
+        zeroline=False,
+        title_font=dict(color=style["font_color"]),
+        tickfont=dict(color=style["tick_color"]),
+        row=1,
+        col=1,
+    )
+    fig.update_xaxes(
+        title_text="Time (s)",
+        gridcolor=style["grid_color"],
+        zeroline=False,
+        title_font=dict(color=style["font_color"]),
+        tickfont=dict(color=style["tick_color"]),
+        row=2,
+        col=1,
     )
     fig.update_yaxes(
-        title_text="u(t)", gridcolor="rgba(99,102,241,0.15)", zeroline=False, showticklabels=False, row=2, col=1
+        title_text="x(t)",
+        gridcolor=style["grid_color"],
+        zeroline=False,
+        showticklabels=False,
+        title_font=dict(color=style["font_color"]),
+        row=1,
+        col=1,
+    )
+    fig.update_yaxes(
+        title_text="u(t)",
+        gridcolor=style["grid_color"],
+        zeroline=False,
+        showticklabels=False,
+        title_font=dict(color=style["font_color"]),
+        row=2,
+        col=1,
     )
 
     return fig
@@ -220,6 +276,14 @@ def configure_page() -> None:
         <style>
             :root {
                 color-scheme: light;
+                --plot-paper-bgcolor: rgba(0, 0, 0, 0);
+                --plot-surface-bgcolor: rgba(248, 250, 252, 0.92);
+                --plot-font-color: #111827;
+                --plot-tick-color: #1f2937;
+                --plot-grid-color: rgba(99, 102, 241, 0.15);
+                --plot-primary-line: #3730a3;
+                --plot-state-line: #1d4ed8;
+                --plot-input-line: #f97316;
             }
             body {
                 background: #f5f7fb;
@@ -276,6 +340,14 @@ def configure_page() -> None:
             @media (prefers-color-scheme: dark) {
                 :root {
                     color-scheme: dark;
+                    --plot-paper-bgcolor: rgba(0, 0, 0, 0);
+                    --plot-surface-bgcolor: rgba(15, 23, 42, 0.92);
+                    --plot-font-color: #e2e8f0;
+                    --plot-tick-color: #cbd5f5;
+                    --plot-grid-color: rgba(148, 163, 184, 0.25);
+                    --plot-primary-line: #a5b4fc;
+                    --plot-state-line: #38bdf8;
+                    --plot-input-line: #fb923c;
                 }
                 body,
                 .stApp {
