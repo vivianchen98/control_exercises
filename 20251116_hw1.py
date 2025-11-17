@@ -9,6 +9,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
+PLOTLY_CONFIG = {"modeBarButtonsToRemove": ["toImage"], "displaylogo": False}
+
 
 @dataclass(frozen=True)
 class SimulationConstants:
@@ -216,6 +218,13 @@ def configure_page() -> None:
     st.markdown(
         """
         <style>
+            :root {
+                color-scheme: light;
+            }
+            body {
+                background: #f5f7fb;
+                color: #1f2937;
+            }
             h1 {font-size: 2rem !important;}
             h2 {font-size: 1.5rem !important;}
             h3 {font-size: 1.2rem !important;}
@@ -264,6 +273,35 @@ def configure_page() -> None:
                 font-variant-numeric: tabular-nums;
                 color: #4c1d95;
             }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    color-scheme: dark;
+                }
+                body,
+                .stApp {
+                    background: #020617;
+                    color: #f8fafc;
+                }
+                .exercise-card {
+                    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(45, 212, 191, 0.22));
+                    border: 1px solid rgba(16, 185, 129, 0.5);
+                    color: #d1fae5;
+                }
+                .demo-card {
+                    background: #0f172a;
+                    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.85);
+                }
+                .slider-card {
+                    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+                    border: 1px solid rgba(99, 102, 241, 0.35);
+                }
+                .slider-label {
+                    color: #e0e7ff;
+                }
+                .slider-value {
+                    color: #c4b5fd;
+                }
+            }
         </style>
         """,
         unsafe_allow_html=True,
@@ -284,10 +322,7 @@ def slider_with_number(
     slider_key = f"{key}_slider"
     number_key = f"{key}_number"
 
-    if slider_key not in st.session_state:
-        st.session_state[slider_key] = default
-    if number_key not in st.session_state:
-        st.session_state[number_key] = default
+    initial_value = st.session_state.get(number_key, st.session_state.get(slider_key, default))
 
     def _sync_from_slider() -> None:
         st.session_state[number_key] = st.session_state[slider_key]
@@ -302,7 +337,7 @@ def slider_with_number(
             min_value=min_value,
             max_value=max_value,
             step=step,
-            value=float(st.session_state[slider_key]),
+            value=float(initial_value),
             key=slider_key,
             on_change=_sync_from_slider,
         )
@@ -312,14 +347,14 @@ def slider_with_number(
             min_value=min_value,
             max_value=max_value,
             step=step,
-            value=float(st.session_state[number_key]),
+            value=float(st.session_state.get(number_key, initial_value)),
             format=format_str,
             key=number_key,
             on_change=_sync_from_number,
             label_visibility="hidden",
         )
 
-    return float(st.session_state[number_key])
+    return float(st.session_state.get(number_key, initial_value))
 
 
 def render_simulation_constants(constants: SimulationConstants, *, label: str) -> None:
@@ -449,7 +484,7 @@ def render_question_one() -> None:
             x0=x0,
         )
         fig = render_closed_loop_plot(time, y)
-        st.plotly_chart(fig, use_container_width=True, theme=None)
+        st.plotly_chart(fig, use_container_width=True, theme=None, config=PLOTLY_CONFIG)
         # render_simulation_constants(Q1_CONSTANTS, label="Question 1")
 
 
@@ -532,7 +567,7 @@ def render_question_two() -> None:
             x0=0.0,
         )
         fig = render_closed_loop_plot(time, y, height=440)
-        st.plotly_chart(fig, use_container_width=True, theme=None)
+        st.plotly_chart(fig, use_container_width=True, theme=None, config=PLOTLY_CONFIG)
         # render_simulation_constants(Q2_CONSTANTS, label="Question 2")
 
 
@@ -633,7 +668,7 @@ def render_question_three() -> None:
             kp_override=kp,
         )
         fig = render_closed_loop_plot(time, y)
-        st.plotly_chart(fig, use_container_width=True, theme=None)
+        st.plotly_chart(fig, use_container_width=True, theme=None, config=PLOTLY_CONFIG)
         st.markdown(f"Selected proportional gain: **kₚ = {kp:.2f}**")
         # render_simulation_constants(Q3_CONSTANTS, label="Question 3")
 
@@ -670,7 +705,7 @@ def render_question_four() -> None:
             omega=omega,
         )
         fig = render_state_input_plot(time, x_signal, u_signal)
-        st.plotly_chart(fig, use_container_width=True, theme=None)
+        st.plotly_chart(fig, use_container_width=True, theme=None, config=PLOTLY_CONFIG)
 
 
 def main() -> None:
