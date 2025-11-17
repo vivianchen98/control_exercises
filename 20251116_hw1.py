@@ -382,6 +382,10 @@ def render_simulation_constants(constants: SimulationConstants, *, label: str) -
 
 def render_question_one() -> None:
     st.header("Question 1: Identifying the system parameters from the forced response of a first-order system (40 pts)")
+    st.image(
+        "/Users/vivianchen/Desktop/workspace/control_exercises/media/feedback.svg",
+        width=800,
+    )
     st.markdown(
         r"""
         Consider the feedback interconnection above where $A$, $B_{1}$, $B_{2}$, and $C$ are scalars.
