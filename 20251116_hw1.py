@@ -781,7 +781,7 @@ def render_question_four() -> None:
             omega=omega,
         )
         fig = render_state_input_plot(time, x_signal, u_signal)
-        st.plotly_chart(fig, width=True, theme=None, config=PLOTLY_CONFIG)
+        st.plotly_chart(fig, use_container_width=True, theme=None, config=PLOTLY_CONFIG)
 
 
 def main() -> None:
